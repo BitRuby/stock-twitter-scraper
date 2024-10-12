@@ -1,1 +1,4 @@
 pymongo==4.3.3
+twikit=2.1.2
+pandas=1.5.3
+numpy=1.23.5
