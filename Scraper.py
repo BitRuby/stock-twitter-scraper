@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 import pymongo
@@ -31,7 +31,7 @@ tw_db = mydb["tweets"]
 daily_tweets_db = mydb["daily_tweets"]
 
 
-# In[27]:
+# In[ ]:
 
 
 from twikit import Client, TooManyRequests, Unauthorized
@@ -68,7 +68,7 @@ async def twitter_login():
     return client
 
 
-# In[3]:
+# In[ ]:
 
 
 from datetime import datetime, timedelta
@@ -80,7 +80,7 @@ def previous_day(date_str):
     return previous_date_str
 
 
-# In[4]:
+# In[ ]:
 
 
 async def fetch_tweets(keyword, date):
@@ -115,7 +115,7 @@ async def fetch_tweets(keyword, date):
         })
 
 
-# In[12]:
+# In[ ]:
 
 
 async def select_tag_and_date():
@@ -146,13 +146,12 @@ async def select_tag_and_date():
             await fetch_tweets(tag['name'], result[0]['date'])
 
 
-# In[10]:
+# In[ ]:
 
 
 async def main():
     client = await twitter_login()
     await select_tag_and_date(client)
-Run the async main function
 if __name__ == "__main__":
     asyncio.run(main())
 
