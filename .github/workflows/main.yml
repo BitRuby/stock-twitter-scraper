@@ -1,0 +1,17 @@
+name: Run Python Script
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run script on Heroku
+        run: |
+          heroku run python Scraper.py --app stock-twitter-scraper
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
