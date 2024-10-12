@@ -9,10 +9,10 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from bson.objectid import ObjectId
 import os
+
 uri = os.environ.get('MONGODB_URI', None)
-# Create a new client and connect to the server
 client = MongoClient(uri, server_api=ServerApi('1'))
-# Send a ping to confirm a successful connection
+
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
@@ -31,7 +31,7 @@ tw_db = mydb["tweets"]
 daily_tweets_db = mydb["daily_tweets"]
 
 
-# In[11]:
+# In[2]:
 
 
 from twikit import Client, TooManyRequests, Unauthorized
@@ -45,21 +45,23 @@ from random import randint
 import time
 import os
 
-USERNAME = 'MichaMikel351'
-EMAIL = 'firewallosiem@gmail.com'
-PASSWORD = 'Karoseria126!'
+USERNAME = os.environ.get('TWITTER_USR', None)
+EMAIL = os.environ.get('TWITTER_EMAIL', None)
+PASSWORD = os.environ.get('TWITTER_PASS', None)
 
-client = Client('en-US')
-await client.login(
-    auth_info_1=USERNAME,
-    auth_info_2=EMAIL,
-    password=PASSWORD
-)
-# client.save_cookies('cookies.json')
-client.load_cookies('cookies.json')
+async def twitter_login():
+    client = Client('en-US')
+    await client.login(
+        auth_info_1=USERNAME,
+        auth_info_2=EMAIL,
+        password=PASSWORD
+    )
+    # client.save_cookies('cookies.json')
+    client.load_cookies('cookies.json')
+    return client
 
 
-# In[5]:
+# In[3]:
 
 
 from datetime import datetime, timedelta
@@ -71,7 +73,7 @@ def previous_day(date_str):
     return previous_date_str
 
 
-# In[6]:
+# In[4]:
 
 
 async def fetch_tweets(keyword, date):
@@ -135,7 +137,17 @@ async def select_tag_and_date():
         ))
         for tag in tags_r:
             await fetch_tweets(tag['name'], result[0]['date'])
-await select_tag_and_date()
+
+
+# In[5]:
+
+
+async def main():
+    client = await twitter_login()
+    await select_tag_and_date(client)
+# Run the async main function
+if __name__ == "__main__":
+    asyncio.run(main())
 
 
 # In[ ]:
