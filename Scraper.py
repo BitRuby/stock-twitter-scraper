@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pymongo
@@ -31,7 +31,7 @@ tw_db = mydb["tweets"]
 daily_tweets_db = mydb["daily_tweets"]
 
 
-# In[ ]:
+# In[2]:
 
 
 from twikit import Client, TooManyRequests, Unauthorized
@@ -68,7 +68,7 @@ async def twitter_login():
     return client
 
 
-# In[ ]:
+# In[3]:
 
 
 from datetime import datetime, timedelta
@@ -80,10 +80,10 @@ def previous_day(date_str):
     return previous_date_str
 
 
-# In[ ]:
+# In[4]:
 
 
-async def fetch_tweets(keyword, date):
+async def fetch_tweets(client, keyword, date):
     tweets_to_store = []
     tag = tags_db.find_one({"name": keyword})
     if tag:
@@ -115,10 +115,10 @@ async def fetch_tweets(keyword, date):
         })
 
 
-# In[ ]:
+# In[5]:
 
 
-async def select_tag_and_date():
+async def select_tag_and_date(client):
     pipeline = [
         {
             "$addFields": {
@@ -136,17 +136,17 @@ async def select_tag_and_date():
     tags = list(daily_tweets_db.find({'date': result[0]['date']}, { 'tag_id': 1, '_id': 0 }))
     if len(tags) == len(list(tags_db.find({}))):
         for tag in tags_db.find({}):
-            await fetch_tweets(tag['name'], previous_day(result[0]['date']))
+            await fetch_tweets(client, tag['name'], previous_day(result[0]['date']))
     else:
         tags_found = [obj['tag_id'] for obj in tags]
         tags_r = list(tags_db.find(
             {"_id": {"$nin": tags_found}} 
         ))
         for tag in tags_r:
-            await fetch_tweets(tag['name'], result[0]['date'])
+            await fetch_tweets(client, tag['name'], result[0]['date'])
 
 
-# In[ ]:
+# In[7]:
 
 
 async def main():
