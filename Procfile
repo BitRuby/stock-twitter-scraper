@@ -1,1 +1,1 @@
-worker: python Scraper.py
+# Empty or do not define worker dyno here
