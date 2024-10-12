@@ -8,8 +8,8 @@ import pymongo
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from bson.objectid import ObjectId
-
-uri = "mongodb+srv://michalzwierzynski:qbGN9Wf022lslPny@nlp.5exh7.mongodb.net/?retryWrites=true&w=majority&appName=nlpsentanalyze"
+import os
+uri = os.environ.get('MONGODB_URI', None)
 # Create a new client and connect to the server
 client = MongoClient(uri, server_api=ServerApi('1'))
 # Send a ping to confirm a successful connection
