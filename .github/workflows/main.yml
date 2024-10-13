@@ -22,6 +22,6 @@ jobs:
 
       - name: Run one-off dyno on Heroku
         run: |
-          heroku run:detached python Scraper.py --app your-heroku-app-name
+          heroku run:detached python Scraper.py --app stock-twitter-scraper
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
