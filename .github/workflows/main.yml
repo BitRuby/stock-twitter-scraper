@@ -1,0 +1,27 @@
+name: Run Python Script
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'  # Every 3 hours
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+
+      - name: Authenticate with Heroku
+        run: heroku auth:token
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+
+      - name: Run one-off dyno on Heroku
+        run: |
+          heroku run:detached python Scraper.py --app stock-twitter-scraper
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
