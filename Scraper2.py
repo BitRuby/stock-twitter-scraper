@@ -94,6 +94,7 @@ async def fetch_tweets(client, keyword, date):
                     minute_until = "30" if minute == 0 else "59" if hour == 24 else "00"
                     minute_since = "30" if minute == 1 else "00"
                     query = f"({tag['tag']}) until:{date}_{hour_until}:{minute_until}:00_UTC since:{date}_{hour-1}:{minute_since}:00_UTC lang:en"
+                    print(f"Getting tweets ({datetime.now()}) from {date} from {date}_{hour-1}:{minute_since} to {hour_until}:{minute_until}")
                     tweets = await client.search_tweet(query, 'Latest')
                     for tweet in tweets:
                         tweets_to_store.append({
