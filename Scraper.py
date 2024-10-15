@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[129]:
 
 
 import pymongo
@@ -31,7 +31,7 @@ tw_db = mydb["tweets"]
 daily_tweets_db = mydb["daily_tweets"]
 
 
-# In[2]:
+# In[130]:
 
 
 from twikit import Client, TooManyRequests, Unauthorized
@@ -68,7 +68,7 @@ async def twitter_login():
     return client
 
 
-# In[3]:
+# In[131]:
 
 
 from datetime import datetime, timedelta
@@ -80,7 +80,7 @@ def previous_day(date_str):
     return previous_date_str
 
 
-# In[4]:
+# In[162]:
 
 
 async def fetch_tweets(client, keyword, date):
@@ -88,25 +88,28 @@ async def fetch_tweets(client, keyword, date):
     tag = tags_db.find_one({"name": keyword})
     if tag:
         for hour in range(1, 25, 1):
-            try:
-                query = f"({tag['tag']}) until:{date}_{hour}:00:00_UTC since:{date}_{hour-1}:00:00_UTC lang:en"
-                print(f"Getting tweets ({datetime.now()}) from {date} at {hour}")
-                tweets = await client.search_tweet(query, 'Latest')
-                for tweet in tweets:
-                    tweets_to_store.append({
-                        "name": tweet.user.name,
-                        "likes": tweet.favorite_count, 
-                        "content": tweet.text,
-                        "created_at": tweet.created_at,
-                        "tag_id": tag["_id"]
-                    })
-                wait = randint(5,10)
-                time.sleep(wait)
-            except TooManyRequests as e:
-                rate_limit_reset = datetime.fromtimestamp(e.rate_limit_reset)
-                print(f"Rate limit reached {datetime.now()}, wait until {rate_limit_reset}")
-                wait_time = rate_limit_reset - datetime.now()
-                time.sleep(wait_time.total_seconds())
+            for minute in range(2):
+                try:
+                    hour_until = hour - 1 if minute == 0 else hour - 1 if hour == 24 else hour
+                    minute_until = "30" if minute == 0 else "59" if hour == 24 else "00"
+                    minute_since = "30" if minute == 1 else "00"
+                    query = f"({tag['tag']}) until:{date}_{hour_until}:{minute_until}:00_UTC since:{date}_{hour-1}:{minute_since}:00_UTC lang:en"
+                    tweets = await client.search_tweet(query, 'Latest')
+                    for tweet in tweets:
+                        tweets_to_store.append({
+                            "name": tweet.user.name,
+                            "likes": tweet.favorite_count, 
+                            "content": tweet.text,
+                            "created_at": tweet.created_at,
+                            "tag_id": tag["_id"]
+                        })
+                    wait = randint(5,10)
+                    time.sleep(wait)
+                except TooManyRequests as e:
+                    rate_limit_reset = datetime.fromtimestamp(e.rate_limit_reset)
+                    print(f"Rate limit reached {datetime.now()}, wait until {rate_limit_reset}")
+                    wait_time = rate_limit_reset - datetime.now()
+                    time.sleep(wait_time.total_seconds())
         result = tw_db.insert_many(tweets_to_store)
         daily_tweets_db.insert_one({
             "date": date,
@@ -115,7 +118,7 @@ async def fetch_tweets(client, keyword, date):
         })
 
 
-# In[5]:
+# In[154]:
 
 
 async def select_tag_and_date(client):
@@ -146,7 +149,7 @@ async def select_tag_and_date(client):
             await fetch_tweets(client, tag['name'], result[0]['date'])
 
 
-# In[7]:
+# In[135]:
 
 
 async def main():
@@ -156,7 +159,7 @@ if __name__ == "__main__":
     asyncio.run(main())
 
 
-# In[ ]:
+# In[136]:
 
 
 # for tag in tags_db.find({}):
