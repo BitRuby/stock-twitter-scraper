@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[129]:
+# In[7]:
 
 
 import pymongo
@@ -31,7 +31,7 @@ tw_db = mydb["tweets"]
 daily_tweets_db = mydb["daily_tweets"]
 
 
-# In[130]:
+# In[13]:
 
 
 from twikit import Client, TooManyRequests, Unauthorized
@@ -68,7 +68,7 @@ async def twitter_login():
     return client
 
 
-# In[131]:
+# In[8]:
 
 
 from datetime import datetime, timedelta
@@ -80,7 +80,7 @@ def previous_day(date_str):
     return previous_date_str
 
 
-# In[162]:
+# In[43]:
 
 
 async def fetch_tweets(client, keyword, date):
@@ -119,7 +119,7 @@ async def fetch_tweets(client, keyword, date):
         })
 
 
-# In[154]:
+# In[39]:
 
 
 async def select_tag_and_date(client):
@@ -138,7 +138,7 @@ async def select_tag_and_date(client):
     ]
     result = list(daily_tweets_db.aggregate(pipeline))
     tags = list(daily_tweets_db.find({'date': result[0]['date']}, { 'tag_id': 1, '_id': 0 }))
-    if len(tags) == len(list(tags_db.find({}))):
+    if len(tags) >= len(list(tags_db.find({}))):
         for tag in tags_db.find({}):
             await fetch_tweets(client, tag['name'], previous_day(result[0]['date']))
     else:
@@ -150,7 +150,7 @@ async def select_tag_and_date(client):
             await fetch_tweets(client, tag['name'], result[0]['date'])
 
 
-# In[135]:
+# In[44]:
 
 
 async def main():
