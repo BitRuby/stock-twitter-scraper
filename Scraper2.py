@@ -137,22 +137,22 @@ async def select_tag_and_date(client):
             "$limit": 1
         }
     ]
-    if len(list(daily_tweets_db.find({}))) == 0:
-        for tag in tags_db.find({}):
-            await fetch_tweets(client, tag['name'], next_day(PREDEFINED_DATE))
-    else:    
-        result = list(daily_tweets_db.aggregate(pipeline))
-        tags = list(daily_tweets_db.find({'date': result[0]['date']}, { 'tag_id': 1, '_id': 0 }))
-        if len(tags) >= len(list(tags_db.find({}))):
-            for tag in tags_db.find({}):
-                await fetch_tweets(client, tag['name'], next_day(result[0]['date']))
-        else:
-            tags_found = [obj['tag_id'] for obj in tags]
-            tags_r = list(tags_db.find(
-                {"_id": {"$nin": tags_found}} 
-            ))
-            for tag in tags_r:
-                await fetch_tweets(client, tag['name'], result[0]['date'])
+    # if len(list(daily_tweets_db.find({}))) == 0:
+    for tag in tags_db.find({}):
+        await fetch_tweets(client, tag['name'], next_day(PREDEFINED_DATE))
+    # else:    
+    #     result = list(daily_tweets_db.aggregate(pipeline))
+    #     tags = list(daily_tweets_db.find({'date': result[0]['date']}, { 'tag_id': 1, '_id': 0 }))
+    #     if len(tags) >= len(list(tags_db.find({}))):
+    #         for tag in tags_db.find({}):
+    #             await fetch_tweets(client, tag['name'], next_day(result[0]['date']))
+    #     else:
+    #         tags_found = [obj['tag_id'] for obj in tags]
+    #         tags_r = list(tags_db.find(
+    #             {"_id": {"$nin": tags_found}} 
+    #         ))
+    #         for tag in tags_r:
+    #             await fetch_tweets(client, tag['name'], result[0]['date'])
 
 
 # In[24]:
