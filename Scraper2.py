@@ -139,7 +139,7 @@ async def select_tag_and_date(client):
     ]
     if len(list(daily_tweets_db.find({}))) == 0:
         for tag in tags_db.find({}):
-            await fetch_tweets(client, tag['name'], next_day(PREDEFINED_DATE))
+            await fetch_tweets(client, tag['name'], next_day(PREDEFINED_DATE)
     else:    
         result = list(daily_tweets_db.aggregate(pipeline))
         tags = list(daily_tweets_db.find({'date': result[0]['date']}, { 'tag_id': 1, '_id': 0 }))
