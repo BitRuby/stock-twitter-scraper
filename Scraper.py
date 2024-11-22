@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[7]:
 
 
 import pymongo
@@ -12,7 +12,6 @@ import os
 
 uri = os.environ.get('MONGODB_URI', None)
 client = MongoClient(uri, server_api=ServerApi('1'))
-PREDEFINED_DATE="2024-01-12"
 
 try:
     client.admin.command('ping')
@@ -32,7 +31,7 @@ tw_db = mydb["tweets"]
 daily_tweets_db = mydb["daily_tweets"]
 
 
-# In[2]:
+# In[13]:
 
 
 from twikit import Client, TooManyRequests, Unauthorized
@@ -69,7 +68,7 @@ async def twitter_login():
     return client
 
 
-# In[3]:
+# In[8]:
 
 
 from datetime import datetime, timedelta
@@ -81,7 +80,7 @@ def previous_day(date_str):
     return previous_date_str
 
 
-# In[4]:
+# In[43]:
 
 
 async def fetch_tweets(client, keyword, date):
@@ -120,7 +119,7 @@ async def fetch_tweets(client, keyword, date):
         })
 
 
-# In[15]:
+# In[39]:
 
 
 async def select_tag_and_date(client):
@@ -137,25 +136,21 @@ async def select_tag_and_date(client):
             "$limit": 1
         }
     ]
-    if len(list(daily_tweets_db.find({}))) == 0:
+    result = list(daily_tweets_db.aggregate(pipeline))
+    tags = list(daily_tweets_db.find({'date': result[0]['date']}, { 'tag_id': 1, '_id': 0 }))
+    if len(tags) >= len(list(tags_db.find({}))):
         for tag in tags_db.find({}):
-            await fetch_tweets(client, tag['name'], previous_day(PREDEFINED_DATE)
-    else:    
-        result = list(daily_tweets_db.aggregate(pipeline))
-        tags = list(daily_tweets_db.find({'date': result[0]['date']}, { 'tag_id': 1, '_id': 0 }))
-        if len(tags) >= len(list(tags_db.find({}))):
-            for tag in tags_db.find({}):
-                await fetch_tweets(client, tag['name'], previous_day(result[0]['date']))
-        else:
-            tags_found = [obj['tag_id'] for obj in tags]
-            tags_r = list(tags_db.find(
-                {"_id": {"$nin": tags_found}} 
-            ))
-            for tag in tags_r:
-                await fetch_tweets(client, tag['name'], result[0]['date'])
+            await fetch_tweets(client, tag['name'], previous_day(result[0]['date']))
+    else:
+        tags_found = [obj['tag_id'] for obj in tags]
+        tags_r = list(tags_db.find(
+            {"_id": {"$nin": tags_found}} 
+        ))
+        for tag in tags_r:
+            await fetch_tweets(client, tag['name'], result[0]['date'])
 
 
-# In[16]:
+# In[44]:
 
 
 async def main():
@@ -165,7 +160,7 @@ if __name__ == "__main__":
     asyncio.run(main())
 
 
-# In[ ]:
+# In[136]:
 
 
 # for tag in tags_db.find({}):
