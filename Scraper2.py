@@ -112,12 +112,13 @@ async def fetch_tweets(client, keyword, date):
                     print(f"Rate limit reached {datetime.now()}, wait until {rate_limit_reset}")
                     wait_time = rate_limit_reset - datetime.now()
                     time.sleep(wait_time.total_seconds())
-        result = tw_db.insert_many(tweets_to_store)
-        daily_tweets_db.insert_one({
-            "date": date,
-            "tweet_ids": result.inserted_ids,
-            "tag_id": tag["_id"]
-        })
+        if len(tweets_to_store) > 0:
+            result = tw_db.insert_many(tweets_to_store)
+            daily_tweets_db.insert_one({
+                "date": date,
+                "tweet_ids": result.inserted_ids,
+                "tag_id": tag["_id"]
+            })
 
 
 # In[31]:
