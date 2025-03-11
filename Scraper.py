@@ -12,7 +12,7 @@ import os
 
 uri = os.environ.get('MONGODB_URI', None)
 client = MongoClient(uri, server_api=ServerApi('1'))
-PREDEFINED_DATE="2023-02-02"
+PREDEFINED_DATE="2022-02-06"
 
 try:
     client.admin.command('ping')
