@@ -1,5 +1,6 @@
 pymongo==4.3.3
-twikit==2.1.2
+twikit==2.3.3
+httpx==0.28.1
 pandas==1.5.3
 numpy==1.23.5
 setuptools>=65.5.0
