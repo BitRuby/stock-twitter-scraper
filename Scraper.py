@@ -55,11 +55,11 @@ async def twitter_login():
         client = Client('en-US')
         client.load_cookies('cookies.json')
         print("Logged in via cookies!")
-        return client
     except Exception as e:
         print(e)
-    finally:
         return None
+    finally:
+        return client
 
 
 # In[3]:
