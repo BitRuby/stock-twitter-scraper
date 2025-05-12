@@ -53,21 +53,13 @@ PASSWORD = os.environ.get('TWITTER_PASS', None)
 async def twitter_login():
     try: 
         client = Client('en-US')
-        await client.login(
-            auth_info_1=USERNAME,
-            auth_info_2=EMAIL,
-            password=PASSWORD
-        )
-        client.save_cookies('cookies.json')
-        print("Logged in and saving cookies!")
-    except Exception as e:
-        print(e)
-    finally:
         client.load_cookies('cookies.json')
         print("Logged in via cookies!")
         return client
-    return client
-
+    except Exception as e:
+        print(e)
+    finally:
+        return None
 
 # In[29]:
 
